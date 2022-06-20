@@ -1,3 +1,7 @@
+data "aws_iam_role" "ecs_task_exec_role" {
+  name = "ecsTaskExecutionRole"
+}
+
 resource "aws_ecr_repository" "ac_ecr_repo" {
   name                 = "assetto-corsa"
   image_tag_mutability = "MUTABLE"
@@ -45,13 +49,17 @@ resource "aws_ecs_task_definition" "ac_task" {
   network_mode             = "awsvpc"
   cpu                      = 2048
   memory                   = 4096
+  task_role_arn            = data.aws_iam_role.ecs_task_exec_role.arn
+  execution_role_arn       = data.aws_iam_role.ecs_task_exec_role.arn
   container_definitions = jsonencode([
     {
-      name      = "ac-server-01"
-      image     = "989660949436.dkr.ecr.us-east-1.amazonaws.com/assetto-corsa:latest"
-      cpu       = 2048
-      memory    = 4096
-      essential = true
+      name             = "ac-server-01"
+      image            = "989660949436.dkr.ecr.us-east-1.amazonaws.com/assetto-corsa:latest"
+      cpu              = 2048
+      memory           = 4096
+      essential        = true
+      taskRoleArn      = data.aws_iam_role.ecs_task_exec_role.arn
+      executionRoleArn = data.aws_iam_role.ecs_task_exec_role.arn
       healthCheck = {
         command  = ["CMD-SHELL", "curl -f http://localhost:8081 || exit 1"]
         retries  = 5
