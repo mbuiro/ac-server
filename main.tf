@@ -43,6 +43,8 @@ resource "aws_ecs_task_definition" "ac_task" {
   family                   = "ac_task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
+  cpu                      = 2048
+  memory                   = 4096
   container_definitions = jsonencode([
     {
       name      = "ac-server-01"
